@@ -61,24 +61,27 @@ const TipTaxTable: React.FC<TipTaxTableProps> = ({ taxRate, tipRate }) => {
     { id: 2, name: "Person 2", subtotal: 0 },
   ]);
 
-  const handleInputChange = useCallback(
-    (index: number, value: string) => {
-      const newData = [...data];
+  const handleInputChange = useCallback((index: number, value: string) => {
+    setData((prevData) => {
+      const newData = [...prevData];
       const parsedValue = parseFloat(value);
-      newData[index].subtotal = isNaN(parsedValue) ? 0 : parsedValue;
-      setData(newData);
-    },
-    [data]
-  );
+      if (!isNaN(parsedValue)) {
+        newData[index] = { ...newData[index], subtotal: parsedValue };
+      }
+      return newData;
+    });
+  }, []);
 
-  const addRow = () => {
-    const newRow: Order = {
-      id: data.length > 0 ? data[data.length - 1].id + 1 : 1,
-      name: `Person ${data.length + 1}`,
-      subtotal: 0,
-    };
-    setData([...data, newRow]);
-  };
+  const addRow = useCallback(() => {
+    setData((prevData) => [
+      ...prevData,
+      {
+        id: prevData.length > 0 ? prevData[prevData.length - 1].id + 1 : 1,
+        name: `Person ${prevData.length + 1}`,
+        subtotal: 0,
+      },
+    ]);
+  }, []);
 
   const removeRow = (id: number) => {
     setData(data.filter((order) => order.id !== id));
@@ -89,12 +92,22 @@ const TipTaxTable: React.FC<TipTaxTableProps> = ({ taxRate, tipRate }) => {
   }, [data]);
 
   const totalTax = useMemo(() => {
-    return (totalSubtotal * totalSubtotal) / 100;
-  }, [totalSubtotal, taxRate]);
+    return data.reduce(
+      (total, order) =>
+        total +
+        (order.subtotal / (totalSubtotal ? totalSubtotal : 1)) * taxRate,
+      0
+    );
+  }, [data, taxRate]);
 
   const totalTip = useMemo(() => {
-    return tipRate;
-  }, [totalSubtotal, tipRate]);
+    return data.reduce(
+      (total, order) =>
+        total +
+        (order.subtotal / (totalSubtotal ? totalSubtotal : 1)) * tipRate,
+      0
+    );
+  }, [data, tipRate]);
 
   const totalBill = useMemo(() => {
     return totalSubtotal + totalTax + totalTip;
@@ -115,8 +128,11 @@ const TipTaxTable: React.FC<TipTaxTableProps> = ({ taxRate, tipRate }) => {
           ) : (
             <input
               type="number"
+              step="any"
+              inputMode="numeric"
               value={row.original.subtotal.toString()}
               onChange={(e) => handleInputChange(row.index, e.target.value)}
+              key={`subtotal-${row.original.id}`}
             />
           ),
       },
@@ -128,8 +144,7 @@ const TipTaxTable: React.FC<TipTaxTableProps> = ({ taxRate, tipRate }) => {
           ) : (
             <span>
               {(
-                (row.original.subtotal /
-                  (row.original.subtotal ? totalSubtotal : 1)) *
+                (row.original.subtotal / (totalSubtotal ? totalSubtotal : 1)) *
                 taxRate
               ).toFixed(2)}
             </span>
@@ -144,8 +159,7 @@ const TipTaxTable: React.FC<TipTaxTableProps> = ({ taxRate, tipRate }) => {
           ) : (
             <span>
               {(
-                (row.original.subtotal /
-                  (row.original.subtotal ? totalSubtotal : 1)) *
+                (row.original.subtotal / (totalSubtotal ? totalSubtotal : 1)) *
                 tipRate
               ).toFixed(2)}
             </span>
@@ -161,8 +175,10 @@ const TipTaxTable: React.FC<TipTaxTableProps> = ({ taxRate, tipRate }) => {
             <span>
               {(
                 row.original.subtotal +
-                (row.original.subtotal * taxRate) / 100 +
-                (row.original.subtotal * tipRate) / 100
+                (row.original.subtotal / (totalSubtotal ? totalSubtotal : 1)) *
+                  tipRate +
+                (row.original.subtotal / (totalSubtotal ? totalSubtotal : 1)) *
+                  taxRate
               ).toFixed(2)}
             </span>
           );

@@ -4,37 +4,3 @@
   background-image: url('/public/go-dutch.jpg');
   background-size:contain;
 }
-
-table {
-  border-spacing: 0;
-  width: 100%;
-  border: 1px solid black;
-
-  th,
-  td {
-    margin: 0;
-    padding: 0.5rem;
-    border-bottom: 1px solid black;
-    border-right: 1px solid black;
-    text-align: right;
-
-    :last-child {
-      border-right: 0;
-    }
-  }
-
-  th {
-    background: #f0f0f0;
-  }
-}
-
-.add-row {
-  margin-top: 10px;
-}
-
-.remove-row {
-  background: red;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
