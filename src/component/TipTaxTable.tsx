@@ -130,7 +130,7 @@ const TipTaxTable: React.FC<TipTaxTableProps> = ({ taxRate, tipRate }) => {
               type="number"
               step="any"
               inputMode="numeric"
-              value={row.original.subtotal.toString()}
+              value={row.original.subtotal}
               onChange={(e) => handleInputChange(row.index, e.target.value)}
               key={`subtotal-${row.original.id}`}
             />

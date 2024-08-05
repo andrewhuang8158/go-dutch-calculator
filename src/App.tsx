@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import ProductForm from "./component/ProductForm";
 import TipTaxTable from "./component/TipTaxTable";
+import GoDutchCalculator from "./component/GoDutchTable";
 
 const App: React.FC = () => {
   const [taxRate, setTaxRate] = useState<number>(7.5);
@@ -33,8 +33,8 @@ const App: React.FC = () => {
           />
         </div>
         <TipTaxTable taxRate={taxRate} tipRate={tipRate} />
+        <GoDutchCalculator />
       </div>
-      {/* <ProductForm /> */}
     </>
   );
 };

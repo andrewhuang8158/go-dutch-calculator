@@ -1,6 +1,6 @@
 #root {
   height: 100vh;
   width: 99vw;
-  background-image: url('/public/go-dutch.jpg');
+  background-image: url('/go-dutch.jpg');
   background-size:contain;
 }
