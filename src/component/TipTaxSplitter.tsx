@@ -1,7 +1,6 @@
 import React, { useMemo, useState, useCallback } from "react";
 import { useTable, Column } from "react-table";
-import styled from "styled-components";
-import "./TipTaxTable.css";
+import "./TipTaxSplitter.css";
 
 interface Order {
   id: number;
@@ -9,57 +8,27 @@ interface Order {
   subtotal: number;
 }
 
-interface TipTaxTableProps {
+interface TipTaxSplitterProps {
   taxRate: number;
   tipRate: number;
 }
 
-const TableStyles = styled.div`
-  table {
-    border-spacing: 0;
-    width: 100%;
-    border: 1px solid black;
-    background-color: white;
-
-    th,
-    td {
-      margin: 0;
-      padding: 0.5rem;
-      border-bottom: 1px solid black;
-      border-right: 1px solid black;
-      text-align: right;
-
-      :last-child {
-        border-right: 0;
-      }
-    }
-
-    th {
-      background: #f0f0f0;
-    }
-  }
-
-  .add-row {
-    margin-top: 10px;
-  }
-
-  .remove-row {
-    background: red;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-
-  .total {
-    font-weight: bold;
-  }
-`;
-
-const TipTaxTable: React.FC<TipTaxTableProps> = ({ taxRate, tipRate }) => {
+const TipTaxSplitter: React.FC<TipTaxSplitterProps> = ({
+  taxRate,
+  tipRate,
+}) => {
   const [data, setData] = useState<Order[]>([
     { id: 1, name: "Person 1", subtotal: 0 },
     { id: 2, name: "Person 2", subtotal: 0 },
   ]);
+
+  const handleNameChange = useCallback((index: number, value: string) => {
+    setData((prevData) => {
+      const newData = [...prevData];
+      newData[index] = { ...newData[index], name: value };
+      return newData;
+    });
+  }, []);
 
   const handleInputChange = useCallback((index: number, value: string) => {
     setData((prevData) => {
@@ -118,6 +87,18 @@ const TipTaxTable: React.FC<TipTaxTableProps> = ({ taxRate, tipRate }) => {
       {
         Header: "Name",
         accessor: "name",
+        Cell: ({ row }: any) =>
+          row.original.id === -1 ? (
+            <span>{row.original.name}</span>
+          ) : (
+            <input
+              type="text"
+              value={row.original.name}
+              onChange={(e) => handleNameChange(row.index, e.target.value)}
+              key={`name-${row.original.id}`}
+              className="name-input"
+            />
+          ),
       },
       {
         Header: "Subtotal",
@@ -201,6 +182,7 @@ const TipTaxTable: React.FC<TipTaxTableProps> = ({ taxRate, tipRate }) => {
       data,
       taxRate,
       tipRate,
+      handleNameChange,
       handleInputChange,
       totalSubtotal,
       totalTax,
@@ -216,7 +198,7 @@ const TipTaxTable: React.FC<TipTaxTableProps> = ({ taxRate, tipRate }) => {
     });
 
   return (
-    <TableStyles>
+    <>
       <table {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup) => (
@@ -246,8 +228,8 @@ const TipTaxTable: React.FC<TipTaxTableProps> = ({ taxRate, tipRate }) => {
       <button className="add-row" onClick={addRow}>
         Add Row
       </button>
-    </TableStyles>
+    </>
   );
 };
 
-export default TipTaxTable;
+export default TipTaxSplitter;
