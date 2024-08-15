@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback } from "react";
-import { useTable } from "react-table";
+import { useTable, Column } from "react-table";
 import "./TipTaxSplitter.css";
 
 interface Order {

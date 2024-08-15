@@ -7,6 +7,8 @@ const GoDutchCalculator = () => {
     { from: string; to: string; amount: string }[]
   >([]);
 
+  type PersonKey = "name" | "cost";
+
   const handleChange = (
     index: number,
     event: React.ChangeEvent<HTMLInputElement>
@@ -15,9 +17,10 @@ const GoDutchCalculator = () => {
     const values = [...people];
 
     if (name === "cost") {
-      values[index][name] = value === "" ? 0 : Math.max(0, parseFloat(value));
+      values[index][name as PersonKey] =
+        value === "" ? 0 : Math.max(0, parseFloat(value));
     } else {
-      values[index][name] = value;
+      values[index][name as PersonKey] = value;
     }
 
     setPeople(values);
