@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback } from "react";
-import { useTable, Column } from "react-table";
+import { useTable } from "react-table";
 import "./TipTaxSplitter.css";
 
 interface Order {
@@ -274,23 +274,23 @@ const TipTaxSplitter = () => {
 
       <table {...getTableProps()}>
         <thead>
-          {headerGroups.map((headerGroup) => (
+          {headerGroups.map((headerGroup: any) => (
             <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
+              {headerGroup.headers.map((column: any) => (
                 <th key={column.id}>{column.render("Header")}</th>
               ))}
             </tr>
           ))}
         </thead>
         <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
+          {rows.map((row: any) => {
             prepareRow(row);
             return (
               <tr
                 key={row.id}
                 className={row.original.id === -1 ? "total" : ""}
               >
-                {row.cells.map((cell) => (
+                {row.cells.map((cell: any) => (
                   <td key={cell.id} {...cell.getCellProps()}>
                     {cell.render("Cell")}
                   </td>

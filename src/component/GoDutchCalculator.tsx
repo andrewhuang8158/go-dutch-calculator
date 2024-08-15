@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./GoDutchCalculator.css";
 
 const GoDutchCalculator = () => {
-  const [people, setPeople] = useState([{ name: "Person 1", cost: "0" }]);
-  const [results, setResults] = useState(null);
+  const [people, setPeople] = useState([{ name: "Person 1", cost: 0 }]);
+  const [results, setResults] = useState<
+    { from: string; to: string; amount: string }[]
+  >([]);
 
-  const handleChange = (index, event) => {
+  const handleChange = (index: any, event: any) => {
     const { name, value } = event.target;
     const values = [...people];
 
-    if (name === "cost" && value < 0) {
-      values[index][name] = 0;
+    if (name === "cost") {
+      values[index][name] = value === "" ? 0 : Math.max(0, parseFloat(value));
     } else {
       values[index][name] = value;
     }
@@ -19,7 +21,7 @@ const GoDutchCalculator = () => {
   };
 
   const handleAddPerson = () => {
-    setPeople([...people, { name: `Person ${people.length + 1}`, cost: "0" }]);
+    setPeople([...people, { name: `Person ${people.length + 1}`, cost: 0 }]);
   };
 
   const handleRemovePerson = () => {
@@ -30,7 +32,7 @@ const GoDutchCalculator = () => {
 
   const calculate = () => {
     const totalCost = people.reduce(
-      (sum, person) => sum + parseFloat(person.cost || 0),
+      (sum, person) => sum + (person.cost || 0),
       0
     );
     const share = totalCost / people.length;
@@ -38,8 +40,8 @@ const GoDutchCalculator = () => {
     // Determine how much each person owes or is owed
     const differences = people.map((person) => ({
       name: person.name,
-      cost: parseFloat(person.cost || 0),
-      difference: parseFloat(person.cost || 0) - share,
+      cost: person.cost || 0,
+      difference: (person.cost || 0) - share,
     }));
 
     // Sort the differences into those who owe and those who are owed
@@ -106,11 +108,16 @@ const GoDutchCalculator = () => {
       {results && (
         <div className="results">
           <h3>Results:</h3>
-          {results.map((result, index) => (
-            <span key={index}>
-              {result.from} pays {result.to} ${result.amount}
-            </span>
-          ))}
+          {results.map(
+            (
+              result: { from: string; to: string; amount: string },
+              index: number
+            ) => (
+              <span key={index}>
+                {result.from} pays {result.to} ${result.amount}
+              </span>
+            )
+          )}
         </div>
       )}
     </div>
