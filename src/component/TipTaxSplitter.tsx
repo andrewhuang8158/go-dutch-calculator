@@ -8,6 +8,13 @@ interface Order {
   subtotal: number;
 }
 
+interface ColumnOrder extends Order {
+  tax?: number;
+  tip?: number;
+  total?: number;
+  remove?: number;
+}
+
 const TipTaxSplitter = () => {
   const [data, setData] = useState<Order[]>([
     { id: 1, name: "Person 1", subtotal: 3 },
@@ -79,12 +86,12 @@ const TipTaxSplitter = () => {
     return totalSubtotal + totalTax + totalTip;
   }, [totalSubtotal, totalTax, totalTip]);
 
-  const columns = useMemo(
+  const columns = useMemo<Column<ColumnOrder>[]>(
     () => [
       {
         Header: "Name",
         accessor: "name",
-        Cell: ({ row }: any) =>
+        Cell: ({ row }: { row: any }) =>
           row.original.id === -1 ? (
             <span>{row.original.name}</span>
           ) : (
@@ -102,7 +109,7 @@ const TipTaxSplitter = () => {
       {
         Header: "Subtotal",
         accessor: "subtotal",
-        Cell: ({ row }: any) =>
+        Cell: ({ row }: { row: any }) =>
           row.original.id === -1 ? (
             <span>{totalSubtotal.toFixed(2)}</span>
           ) : (
@@ -121,7 +128,7 @@ const TipTaxSplitter = () => {
       {
         Header: "Tax",
         accessor: "tax",
-        Cell: ({ row }: any) => {
+        Cell: ({ row }: { row: any }) => {
           return row.original.id === -1 ? (
             <span>{totalTax.toFixed(2)}</span>
           ) : (
@@ -141,7 +148,7 @@ const TipTaxSplitter = () => {
       {
         Header: "Tip",
         accessor: "tip",
-        Cell: ({ row }: any) => {
+        Cell: ({ row }: { row: any }) => {
           return row.original.id === -1 ? (
             <span>{totalTip.toFixed(2)}</span>
           ) : (
@@ -161,7 +168,7 @@ const TipTaxSplitter = () => {
       {
         Header: "Total",
         accessor: "total",
-        Cell: ({ row }: any) => {
+        Cell: ({ row }: { row: any }) => {
           const subtotal = row.original.subtotal;
           const tax =
             Math.round(
@@ -188,7 +195,7 @@ const TipTaxSplitter = () => {
       {
         Header: "Remove",
         accessor: "remove",
-        Cell: ({ row }: any) =>
+        Cell: ({ row }: { row: any }) =>
           row.original.id === -1 ? null : (
             <button
               className="remove-row"

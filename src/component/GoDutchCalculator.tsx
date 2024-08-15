@@ -7,7 +7,10 @@ const GoDutchCalculator = () => {
     { from: string; to: string; amount: string }[]
   >([]);
 
-  const handleChange = (index: any, event: any) => {
+  const handleChange = (
+    index: number,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { name, value } = event.target;
     const values = [...people];
 
