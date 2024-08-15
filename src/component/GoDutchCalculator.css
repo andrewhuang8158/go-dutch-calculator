@@ -12,11 +12,9 @@
 }
 
 .button-group {
-  margin-top: 20px;
-}
-
-.results-container {
-
+  display: flex;
+  gap: 5px;
+  margin-bottom: 20px;
 }
 
 .results {

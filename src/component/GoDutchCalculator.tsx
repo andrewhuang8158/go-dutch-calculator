@@ -77,6 +77,10 @@ const GoDutchCalculator = () => {
 
   return (
     <div className="container">
+      <div className="button-group">
+        <button onClick={handleAddPerson}>Add Person</button>
+        <button onClick={handleRemovePerson}>Remove Last</button>
+      </div>
       {people.map((person, index) => (
         <div key={index} className="person-input">
           <input
@@ -96,10 +100,6 @@ const GoDutchCalculator = () => {
           />
         </div>
       ))}
-      <div className="button-group">
-        <button onClick={handleAddPerson}>Add Person</button>
-        <button onClick={handleRemovePerson}>Remove Last</button>
-      </div>
       <div className="button-group">
         <button onClick={calculate}>Calculate</button>
       </div>

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useTable, Column } from "react-table";
 import "./TipTaxSplitter.css";
 
@@ -8,19 +8,13 @@ interface Order {
   subtotal: number;
 }
 
-interface TipTaxSplitterProps {
-  taxRate: number;
-  tipRate: number;
-}
-
-const TipTaxSplitter: React.FC<TipTaxSplitterProps> = ({
-  taxRate,
-  tipRate,
-}) => {
+const TipTaxSplitter = () => {
   const [data, setData] = useState<Order[]>([
-    { id: 1, name: "Person 1", subtotal: 0 },
-    { id: 2, name: "Person 2", subtotal: 0 },
+    { id: 1, name: "Person 1", subtotal: 3 },
+    { id: 2, name: "Person 2", subtotal: 5 },
   ]);
+  const [taxRate, setTaxRate] = useState<number>(0);
+  const [tipRate, setTipRate] = useState<number>(0);
 
   const handleNameChange = useCallback((index: number, value: string) => {
     setData((prevData) => {
@@ -30,16 +24,19 @@ const TipTaxSplitter: React.FC<TipTaxSplitterProps> = ({
     });
   }, []);
 
-  const handleInputChange = useCallback((index: number, value: string) => {
-    setData((prevData) => {
-      const newData = [...prevData];
+  const handleInputChange = useCallback(
+    (index: number, value: string) => {
       const parsedValue = parseFloat(value);
       if (!isNaN(parsedValue)) {
-        newData[index] = { ...newData[index], subtotal: parsedValue };
+        setData((prevData) =>
+          prevData.map((order, i) =>
+            i === index ? { ...order, subtotal: parsedValue } : order
+          )
+        );
       }
-      return newData;
-    });
-  }, []);
+    },
+    [setData]
+  );
 
   const addRow = useCallback(() => {
     setData((prevData) => [
@@ -64,25 +61,25 @@ const TipTaxSplitter: React.FC<TipTaxSplitterProps> = ({
     return data.reduce(
       (total, order) =>
         total +
-        (order.subtotal / (totalSubtotal ? totalSubtotal : 1)) * taxRate,
+          (order.subtotal / (totalSubtotal ? totalSubtotal : 1)) * taxRate || 0,
       0
     );
-  }, [data, taxRate]);
+  }, [data, taxRate, totalSubtotal]);
 
   const totalTip = useMemo(() => {
     return data.reduce(
       (total, order) =>
         total +
-        (order.subtotal / (totalSubtotal ? totalSubtotal : 1)) * tipRate,
+          (order.subtotal / (totalSubtotal ? totalSubtotal : 1)) * tipRate || 0,
       0
     );
-  }, [data, tipRate]);
+  }, [data, tipRate, totalSubtotal]);
 
   const totalBill = useMemo(() => {
     return totalSubtotal + totalTax + totalTip;
   }, [totalSubtotal, totalTax, totalTip]);
 
-  const columns = useMemo<Column<Order>[]>(
+  const columns = useMemo(
     () => [
       {
         Header: "Name",
@@ -95,8 +92,10 @@ const TipTaxSplitter: React.FC<TipTaxSplitterProps> = ({
               type="text"
               value={row.original.name}
               onChange={(e) => handleNameChange(row.index, e.target.value)}
+              onFocus={(e) => e.target.select()}
               key={`name-${row.original.id}`}
               className="name-input"
+              autoComplete="off"
             />
           ),
       },
@@ -113,20 +112,27 @@ const TipTaxSplitter: React.FC<TipTaxSplitterProps> = ({
               inputMode="numeric"
               value={row.original.subtotal}
               onChange={(e) => handleInputChange(row.index, e.target.value)}
+              onFocus={(e) => e.target.select()}
               key={`subtotal-${row.original.id}`}
+              autoComplete="off"
             />
           ),
       },
       {
         Header: "Tax",
+        accessor: "tax",
         Cell: ({ row }: any) => {
           return row.original.id === -1 ? (
             <span>{totalTax.toFixed(2)}</span>
           ) : (
             <span>
               {(
-                (row.original.subtotal / (totalSubtotal ? totalSubtotal : 1)) *
-                taxRate
+                Math.round(
+                  (row.original.subtotal /
+                    (totalSubtotal ? totalSubtotal : 1)) *
+                    100 *
+                    taxRate || 0
+                ) / 100
               ).toFixed(2)}
             </span>
           );
@@ -134,14 +140,19 @@ const TipTaxSplitter: React.FC<TipTaxSplitterProps> = ({
       },
       {
         Header: "Tip",
+        accessor: "tip",
         Cell: ({ row }: any) => {
           return row.original.id === -1 ? (
             <span>{totalTip.toFixed(2)}</span>
           ) : (
             <span>
               {(
-                (row.original.subtotal / (totalSubtotal ? totalSubtotal : 1)) *
-                tipRate
+                Math.round(
+                  (row.original.subtotal /
+                    (totalSubtotal ? totalSubtotal : 1)) *
+                    100 *
+                    tipRate || 0
+                ) / 100
               ).toFixed(2)}
             </span>
           );
@@ -149,24 +160,34 @@ const TipTaxSplitter: React.FC<TipTaxSplitterProps> = ({
       },
       {
         Header: "Total",
+        accessor: "total",
         Cell: ({ row }: any) => {
+          const subtotal = row.original.subtotal;
+          const tax =
+            Math.round(
+              (row.original.subtotal / (totalSubtotal ? totalSubtotal : 1)) *
+                100 *
+                taxRate || 0
+            ) / 100;
+          const tip =
+            Math.round(
+              (row.original.subtotal / (totalSubtotal ? totalSubtotal : 1)) *
+                100 *
+                tipRate || 0
+            ) / 100;
+
+          const total = subtotal + tax + tip;
+
           return row.original.id === -1 ? (
             <span>{totalBill.toFixed(2)}</span>
           ) : (
-            <span>
-              {(
-                row.original.subtotal +
-                (row.original.subtotal / (totalSubtotal ? totalSubtotal : 1)) *
-                  tipRate +
-                (row.original.subtotal / (totalSubtotal ? totalSubtotal : 1)) *
-                  taxRate
-              ).toFixed(2)}
-            </span>
+            <span>{total.toFixed(2)}</span>
           );
         },
       },
       {
         Header: "Remove",
+        accessor: "remove",
         Cell: ({ row }: any) =>
           row.original.id === -1 ? null : (
             <button
@@ -199,12 +220,64 @@ const TipTaxSplitter: React.FC<TipTaxSplitterProps> = ({
 
   return (
     <>
+      <a
+        className="law-checker-link"
+        href="https://www.law.cornell.edu/wex/table_tax"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Look for your local tipping/tax laws!
+      </a>
+      <p>
+        Tired of paying a fat tip when your order was cheaper than that $60
+        steak? This has got you covered.
+      </p>
+      <p>
+        This calculator table distributes the tax and tip proportionately to the
+        subtotals of the dishes ordered.
+      </p>
+      <p>
+        Simply input the tax amount paid, tip amount paid, and subtotals of all
+        dishes ordered and the calculator will do the rest.
+      </p>
+
+      <div className="tax-rate-wrapper">
+        <label htmlFor="taxRate">Tax Amount ($): </label>
+        <input
+          id="taxRate"
+          type="number"
+          value={taxRate}
+          onChange={(e) => setTaxRate(parseFloat(e.target.value))}
+          onFocus={(e) => e.target.select()}
+          onBlur={(e) => {
+            if (e.target.value.trim() === "") {
+              setTaxRate(0);
+            }
+          }}
+        />
+      </div>
+      <div className="tip-rate-wrapper">
+        <label htmlFor="tipRate">Tip Amount ($): </label>
+        <input
+          id="tipRate"
+          type="number"
+          value={tipRate}
+          onChange={(e) => setTipRate(parseFloat(e.target.value))}
+          onFocus={(e) => e.target.select()}
+          onBlur={(e) => {
+            if (e.target.value.trim() === "") {
+              setTipRate(0);
+            }
+          }}
+        />
+      </div>
+
       <table {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
+            <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+                <th key={column.id}>{column.render("Header")}</th>
               ))}
             </tr>
           ))}
@@ -214,11 +287,13 @@ const TipTaxSplitter: React.FC<TipTaxSplitterProps> = ({
             prepareRow(row);
             return (
               <tr
-                {...row.getRowProps()}
+                key={row.id}
                 className={row.original.id === -1 ? "total" : ""}
               >
                 {row.cells.map((cell) => (
-                  <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                  <td key={cell.id} {...cell.getCellProps()}>
+                    {cell.render("Cell")}
+                  </td>
                 ))}
               </tr>
             );
@@ -228,6 +303,8 @@ const TipTaxSplitter: React.FC<TipTaxSplitterProps> = ({
       <button className="add-row" onClick={addRow}>
         Add Row
       </button>
+      {/* {console.log("columns:", columns)}
+      {console.log("rows:", rows)} */}
     </>
   );
 };

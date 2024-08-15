@@ -5,11 +5,11 @@ body {
   width: 100vw;
 }
 #root {
-  padding: 20px;
+  /* padding: 20px; */
   height: 100vh;
   width: 100%;
   /* background-image: url('/go-dutch.jpg'); */
-  background-size:contain;
+  background-size: contain;
   background-color: tan;
   box-sizing: border-box;
 }
@@ -19,11 +19,25 @@ h1 {
 }
 
 ul {
+  position: relative;
   display: flex;
-  flex-flow: row;
-  justify-content:space-between;
+  flex-flow: row wrap;
   align-items: center;
   margin: 0;
+}
+
+.home-link {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  color: white;
+  text-decoration: none;
+}
+
+.home-text {
+  font-size: 20px;
+  width: fit-content;
+  margin-left: 10px;
 }
 
 .home-icon {
@@ -32,25 +46,25 @@ ul {
   width: 25px;
 }
 
-.calculators-wrapper {
-  display: flex;
-  flex-flow: row;
-}
-
 .navbar {
   background-color: #333;
   padding: 10px;
   width: 100%;
   box-sizing: border-box;
   border-radius: 5px;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .nav-list {
   list-style-type: none;
   padding: 0;
   display: flex;
-  width: 100%;
+  width: auto;
   overflow: hidden;
+  margin-left: auto;
 }
 
 .nav-item {
@@ -76,8 +90,31 @@ ul {
   background-color: white;
 }
 
-.App, .home {
+.App,
+.home {
   padding: 10px;
   background-color: white;
   border-radius: 5px;
+}
+
+.nav-list.hidden {
+  display: none;
+}
+
+.hamburger {
+  display: none;
+  cursor: pointer;
+  background-color: transparent;
+  border-radius: 5px;
+}
+
+.hamburger.visible {
+  display: block;
+  margin-left: auto;
+}
+
+/* Optional: You can add some transitions for smooth visibility change */
+.nav-list.hidden,
+.hamburger.visible {
+  transition: all 0.3s ease;
 }
