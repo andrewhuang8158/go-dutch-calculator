@@ -7,9 +7,7 @@ const GoDutchCalculator = () => {
     { from: string; to: string; amount: string }[]
   >([]);
 
-  type PersonKey = "name" | "cost";
-
-  const handleChange = (
+  const handleCostChange = (
     index: number,
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -17,11 +15,20 @@ const GoDutchCalculator = () => {
     const values = [...people];
 
     if (name === "cost") {
-      values[index][name as PersonKey] =
-        value === "" ? 0 : Math.max(0, parseFloat(value));
-    } else {
-      values[index][name as PersonKey] = value;
-    }
+      values[index][name] = value === "" ? 0 : Math.max(0, parseFloat(value));
+
+    setPeople(values);
+  };
+
+  const handleNameChange = (
+    index: number,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = event.target;
+    const values = [...people];
+
+    if (name === "name") {
+      values[index][name] = value === "" ? 0 : Math.max(0, parseFloat(value));
 
     setPeople(values);
   };
@@ -96,7 +103,7 @@ const GoDutchCalculator = () => {
             name="name"
             placeholder="Enter name"
             value={person.name}
-            onChange={(event) => handleChange(index, event)}
+            onChange={(event) => handleNameChange(index, event)}
             min="0"
           />
           <input
@@ -104,7 +111,7 @@ const GoDutchCalculator = () => {
             name="cost"
             placeholder="Enter total cost"
             value={person.cost}
-            onChange={(event) => handleChange(index, event)}
+            onChange={(event) => handleCostChange(index, event)}
           />
         </div>
       ))}
