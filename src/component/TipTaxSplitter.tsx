@@ -220,9 +220,19 @@ const TipTaxSplitter = () => {
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable<Order>({
+    useTable<ColumnOrder>({
       columns,
-      data: [...data, { id: -1, name: "Total", subtotal: totalSubtotal }],
+      data: [
+        ...data,
+        {
+          id: -1,
+          name: "Total",
+          subtotal: totalSubtotal,
+          tax: totalTax,
+          tip: totalTip,
+          total: totalBill,
+        },
+      ],
     });
 
   return (
