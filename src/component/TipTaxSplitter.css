@@ -24,6 +24,10 @@ table {
   }
 }
 
+.tipRate {
+  margin-bottom: 10px;
+}
+
 .add-row {
   margin-top: 10px;
 }
@@ -33,6 +37,8 @@ table {
   color: white;
   border: none;
   cursor: pointer;
+  margin-left: -10px;
+  margin-right: 10px;
 }
 
 .total {
